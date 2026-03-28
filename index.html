@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irani (RANI3) — Dashboard Financeiro</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --green: #2e7d32;
+  --green-light: #43a047;
+  --green-dark: #1b5e20;
+  --bg: #f5f7f0;
+  --card-bg: #ffffff;
+  --text: #263238;
+  --text-light: #546e7a;
+  --border: #e0e0e0;
+  --red: #c62828;
+  --blue: #1565c0;
+  --orange: #ef6c00;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+.header {
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  color: white; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between;
+}
+.header h1 { font-size: 1.8rem; font-weight: 700; }
+.header .subtitle { opacity: .85; font-size: .95rem; margin-top: 4px; }
+.header .badge { background: rgba(255,255,255,.2); padding: 6px 14px; border-radius: 20px; font-size: .85rem; }
+.tabs {
+  display: flex; background: white; border-bottom: 2px solid var(--border);
+  padding: 0 24px; overflow-x: auto; position: sticky; top: 0; z-index: 10;
+}
+.tab {
+  padding: 14px 20px; cursor: pointer; font-weight: 600; font-size: .9rem;
+  border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap;
+  transition: all .2s;
+}
+.tab:hover { color: var(--green); }
+.tab.active { color: var(--green-dark); border-bottom-color: var(--green); }
+.content { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.grid { display: grid; gap: 20px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+.card {
+  background: var(--card-bg); border-radius: 12px; padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid var(--border);
+}
+.card h3 { font-size: .85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.card .value { font-size: 1.8rem; font-weight: 700; color: var(--green-dark); }
+.card .delta { font-size: .85rem; margin-top: 4px; }
+.delta.up { color: var(--green); }
+.delta.down { color: var(--red); }
+.section-title { font-size: 1.1rem; font-weight: 700; margin: 28px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--green); display: inline-block; }
+.chart-card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid var(--border); }
+.chart-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: 16px; }
+canvas { max-height: 320px; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
+th { background: #f9faf6; font-weight: 600; color: var(--text-light); text-transform: uppercase; font-size: .75rem; letter-spacing: .5px; position: sticky; top: 0; }
+td:first-child, th:first-child { text-align: left; }
+tr:hover td { background: #f5f7f0; }
+.table-wrap { overflow-x: auto; }
+.highlight-row td { font-weight: 700; background: #e8f5e9 !important; }
+.source-list { list-style: none; }
+.source-list li { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 12px; }
+.source-list .tag { background: var(--green); color: white; padding: 2px 10px; border-radius: 12px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.note { background: #fff8e1; border-left: 4px solid var(--orange); padding: 12px 16px; border-radius: 4px; font-size: .85rem; margin: 12px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🌲 Irani Papel e Embalagem S.A.</h1>
+    <div class="subtitle">RANI3 — Novo Mercado B3 | Dashboard Financeiro 2024–2025</div>
+  </div>
+  <div style="text-align:right">
+    <div class="badge">Rating: brAA (S&P) / AA.br (Moody's)</div>
+    <div class="badge" style="margin-top:6px">Atualizado: Mar/2026</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="resultados">📊 Resultados</div>
+  <div class="tab" data-tab="capital">🏦 Estrutura de Capital</div>
+  <div class="tab" data-tab="operacional">🏭 Operacional</div>
+  <div class="tab" data-tab="valuation">📈 Valuation & Retorno</div>
+  <div class="tab" data-tab="fontes">📋 Fontes</div>
+</div>
+
+<div class="content">
+
+<!-- ==================== ABA 1: RESULTADOS ==================== -->
+<div class="tab-panel active" id="resultados">
+
+  <div class="grid grid-4" style="margin-bottom:24px">
+    <div class="card">
+      <h3>Receita Líquida 2025</h3>
+      <div class="value">R$ 1.686 mi</div>
+      <div class="delta up">▲ +8,4% vs 2024</div>
+    </div>
+    <div class="card">
+      <h3>EBITDA Ajustado 2025 (OC)</h3>
+      <div class="value">R$ 539 mi</div>
+      <div class="delta up">▲ +11,4% vs 2024 | Margem 32,0%</div>
+    </div>
+    <div class="card">
+      <h3>Lucro Líquido 2025</h3>
+      <div class="value">R$ 242 mi</div>
+      <div class="delta down">▼ -20,5% vs 2024*</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:2px">*2024 inclui crédito tributário não recorrente de R$168mi</div>
+    </div>
+    <div class="card">
+      <h3>LL Recorrente 2025 (s/ biol.)</h3>
+      <div class="value">R$ 127 mi</div>
+      <div class="delta up">▲ +64,9% vs 2024</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <h3>Receita Líquida Trimestral (R$ mi)</h3>
+      <canvas id="chartReceita"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>EBITDA Ajustado & Margem (OC+OD)</h3>
+      <canvas id="chartEbitda"></canvas>
+    </div>
+  </div>
+
+  <div class="section-title">DRE Consolidada (R$ mil)</div>
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr><th>Linha</th><th>2025</th><th>2024</th><th>Var.</th><th>4T25</th><th>3T25</th><th>2T25</th><th>1T25</th></tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row"><td>Receita Líquida</td><td>1.686.311</td><td>1.555.346</td><td>+8,4%</td><td>415.996</td><td>433.463</td><td>413.774</td><td>423.078</td></tr>
+        <tr><td>Var. Valor Justo Ativos Biológicos</td><td>116.800</td><td>83.736</td><td>+39,5%</td><td>9.397</td><td>5.386</td><td>76.302</td><td>25.715</td></tr>
+        <tr><td>CPV</td><td>(1.102.869)</td><td>(1.013.128)</td><td>+8,9%</td><td>(272.392)</td><td>(281.484)</td><td>(274.115)</td><td>(274.878)</td></tr>
+        <tr class="highlight-row"><td>Lucro Bruto</td><td>700.242</td><td>625.954</td><td>+11,9%</td><td>153.001</td><td>157.365</td><td>215.961</td><td>173.915</td></tr>
+        <tr><td>  Margem Bruta</td><td>41,5%</td><td>40,2%</td><td>+1,3pp</td><td>36,8%</td><td>36,3%</td><td>52,2%</td><td>41,1%</td></tr>
+        <tr><td>Despesas com Vendas</td><td>(127.554)</td><td>(132.397)</td><td>-3,7%</td><td>(31.056)</td><td>(29.958)</td><td>(31.923)</td><td>(34.617)</td></tr>
+        <tr><td>Despesas G&A</td><td>(117.545)</td><td>(119.312)</td><td>-1,5%</td><td>(32.974)</td><td>(27.559)</td><td>(28.103)</td><td>(28.909)</td></tr>
+        <tr><td>Outras Receitas/Desp. Operac.</td><td>11.911</td><td>(25.541)</td><td>n/a</td><td>(6.214)</td><td>(126)</td><td>18.316</td><td>(65)</td></tr>
+        <tr class="highlight-row"><td>EBIT</td><td>447.806</td><td>328.931</td><td>+36,1%</td><td>77.120</td><td>95.161</td><td>169.750</td><td>105.775</td></tr>
+        <tr><td>Resultado Financeiro</td><td>(130.859)</td><td>(109.939)</td><td>+19,0%</td><td>(29.516)</td><td>(33.776)</td><td>(37.398)</td><td>(30.169)</td></tr>
+        <tr><td>  Receitas Financeiras</td><td>126.695</td><td>99.984</td><td>+26,7%</td><td>34.653</td><td>33.332</td><td>32.381</td><td>26.329</td></tr>
+        <tr><td>  Despesas Financeiras</td><td>(257.554)</td><td>(209.923)</td><td>+22,7%</td><td>(64.169)</td><td>(67.108)</td><td>(69.779)</td><td>(56.498)</td></tr>
+        <tr><td>LAIR</td><td>316.947</td><td>218.992</td><td>+44,7%</td><td>47.604</td><td>61.385</td><td>132.352</td><td>75.606</td></tr>
+        <tr><td>IR/CSLL (corrente + diferido)</td><td>(62.984)</td><td>96.992</td><td>n/a</td><td>(8.588)</td><td>(19.309)</td><td>(20.284)</td><td>(14.803)</td></tr>
+        <tr class="highlight-row"><td>Lucro Líquido (OC)</td><td>253.963</td><td>315.984</td><td>-19,6%</td><td>39.016</td><td>42.076</td><td>112.068</td><td>60.803</td></tr>
+        <tr><td>Resultado Op. Descontinuada</td><td>(11.913)</td><td>(11.465)</td><td>+3,9%</td><td>(1.019)</td><td>(965)</td><td>(7.821)</td><td>(2.108)</td></tr>
+        <tr class="highlight-row"><td>Lucro Líquido Total</td><td>242.050</td><td>304.519</td><td>-20,5%</td><td>37.997</td><td>41.111</td><td>104.247</td><td>58.695</td></tr>
+        <tr><td>  Margem Líquida</td><td>14,4%</td><td>19,6%</td><td>-5,2pp</td><td>9,1%</td><td>9,5%</td><td>25,2%</td><td>13,9%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">⚠️ O lucro líquido de 2024 inclui efeito não recorrente de crédito tributário (exclusão ICMS presumido da base IRPJ/CSLL) de R$ 168.248 mil líquidos no 4T24. O lucro recorrente (sem biológicos) subiu de R$ 76,7mi (2024) para R$ 126,5mi (2025), alta de 64,9%.</div>
+
+  <div class="section-title">Fluxo de Caixa Consolidado (R$ mil)</div>
+  <div class="grid grid-2">
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Linha</th><th>2025</th><th>2024</th></tr></thead>
+        <tbody>
+          <tr class="highlight-row"><td>Caixa Ativ. Operacionais</td><td>504.071</td><td>395.588</td></tr>
+          <tr><td>  LAIR</td><td>305.034</td><td>207.527</td></tr>
+          <tr><td>  Depreciação/Amortização</td><td>204.753</td><td>195.234</td></tr>
+          <tr><td>  Var. Capital de Giro</td><td>131.792</td><td>64.410</td></tr>
+          <tr><td>  Juros Pagos</td><td>(194.810)</td><td>(150.869)</td></tr>
+          <tr><td>  IR/CSLL Pagos</td><td>(26.456)</td><td>(33.841)</td></tr>
+          <tr class="highlight-row"><td>Caixa Ativ. Investimento</td><td>(252.924)</td><td>(107.171)</td></tr>
+          <tr><td>  Capex (imob.+biol.+intang.)</td><td>(253.917)</td><td>(229.464)</td></tr>
+          <tr class="highlight-row"><td>Caixa Ativ. Financiamento</td><td>(15.545)</td><td>(168.337)</td></tr>
+          <tr><td>  Dividendos Pagos</td><td>(169.796)</td><td>(126.043)</td></tr>
+          <tr><td>  Recompra de Ações</td><td>(22.052)</td><td>(49.169)</td></tr>
+          <tr><td>  Captações - Amortizações</td><td>185.986</td><td>17.640</td></tr>
+          <tr class="highlight-row"><td>Variação de Caixa</td><td>+235.602</td><td>+120.080</td></tr>
+          <tr class="highlight-row"><td>Caixa Final</td><td>839.834</td><td>604.232</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-card">
+      <h3>Lucro Líquido Trimestral (R$ mi)</h3>
+      <canvas id="chartLL"></canvas>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:20px">
+    <div class="chart-card">
+      <h3>Fluxo de Caixa Livre Ajustado (R$ mi)</h3>
+      <canvas id="chartFCL"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Margem Bruta vs Margem EBITDA Ajustada (%)</h3>
+      <canvas id="chartMargens"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ABA 2: ESTRUTURA DE CAPITAL ==================== -->
+<div class="tab-panel" id="capital">
+
+  <div class="grid grid-4" style="margin-bottom:24px">
+    <div class="card">
+      <h3>Dívida Líquida</h3>
+      <div class="value">R$ 1.058 mi</div>
+      <div class="delta up">▼ -1,7% vs 2024</div>
+    </div>
+    <div class="card">
+      <h3>Dív. Líq./EBITDA</h3>
+      <div class="value">1,99x</div>
+      <div class="delta up">▼ vs 2,26x em 2024</div>
+    </div>
+    <div class="card">
+      <h3>Patrimônio Líquido</h3>
+      <div class="value">R$ 1.452 mi</div>
+      <div class="delta up">▲ +6,2% vs 2024</div>
+    </div>
+    <div class="card">
+      <h3>Custo Dívida (Kd)</h3>
+      <div class="value">CDI - 0,7%</div>
+      <div class="delta up">13,5% a.a. bruto | 8,9% pós-IR</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <h3>Dívida Líquida vs EBITDA (R$ mi) & Alavancagem</h3>
+      <canvas id="chartDivida"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Posição de Caixa vs Dívida Bruta (R$ mi)</h3>
+      <canvas id="chartCaixaDivBruta"></canvas>
+    </div>
+  </div>
+
+  <div class="section-title">Perfil do Endividamento (dez/2025)</div>
+  <div class="grid grid-3" style="margin-bottom:20px">
+    <div class="card" style="text-align:center">
+      <h3>Dívida LP vs CP</h3>
+      <canvas id="chartPerfil" style="max-height:200px"></canvas>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>Moeda</h3>
+      <canvas id="chartMoeda" style="max-height:200px"></canvas>
+    </div>
+    <div class="card">
+      <h3>Indicadores</h3>
+      <table>
+        <tr><td>Dívida Bruta</td><td>R$ 1.897.715 mil</td></tr>
+        <tr><td>(-) Caixa</td><td>R$ 839.834 mil</td></tr>
+        <tr><td><b>Dívida Líquida</b></td><td><b>R$ 1.057.881 mil</b></td></tr>
+        <tr><td>Prazo Médio</td><td>41,6 meses (3,5 anos)</td></tr>
+        <tr><td>LP / Total</td><td>88%</td></tr>
+        <tr><td>Moeda Local</td><td>99%</td></tr>
+        <tr><td>DL/EBITDA</td><td>1,99x (meta: ≤2,5x)</td></tr>
+        <tr><td>DL/EBITDA c/ IFRS16</td><td>2,09x</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Debêntures Verdes</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Emissão</th><th>Montante</th><th>Taxa</th><th>Destino</th></tr></thead>
+      <tbody>
+        <tr><td>5ª Emissão</td><td>R$ 500.000 mil</td><td>IPCA + spread (swap CDI)</td><td>Plataforma Gaia</td></tr>
+        <tr><td>6ª Emissão (out/2025)</td><td>R$ 120.000 mil</td><td>IPCA + 6,6522% (swap CDI - 1,13%)</td><td>Gaia V - Repotenciação São Luiz (PCH)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Composição Acionária (fev/2026)</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <table>
+        <thead><tr><th>Acionista</th><th>Qtd. Ações ON</th><th>%</th></tr></thead>
+        <tbody>
+          <tr><td>Irani Participações S.A.</td><td>112.624.829</td><td>48,86%</td></tr>
+          <tr><td>Habitasul Desenv. Imobiliários</td><td>13.706.751</td><td>5,84%</td></tr>
+          <tr><td>Cia Habitasul de Participações</td><td>2.070.867</td><td>0,90%</td></tr>
+          <tr><td>Cia Comercial de Imóveis</td><td>831.000</td><td>0,36%</td></tr>
+          <tr><td>Ações em Tesouraria</td><td>0</td><td>0,00%</td></tr>
+          <tr class="highlight-row"><td>Free Float</td><td>101.517.772</td><td>44,04%</td></tr>
+          <tr class="highlight-row"><td><b>Total</b></td><td><b>230.501.219</b></td><td><b>100%</b></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;font-size:.85rem;color:var(--text-light)">Capital Social: R$ 646.894.847,81 (abr/2025: aumento de R$543mi → R$623mi, depois R$646mi)</div>
+    </div>
+    <div class="chart-card">
+      <h3>Estrutura Acionária</h3>
+      <canvas id="chartAcionistas" style="max-height:260px"></canvas>
+    </div>
+  </div>
+
+  <div class="section-title">Balanço Patrimonial Resumido (R$ mil)</div>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>Linha</th><th>Dez/2025</th><th>Dez/2024</th><th>Var.</th></tr></thead>
+      <tbody>
+        <tr class="highlight-row"><td><b>ATIVO TOTAL</b></td><td>3.949.686</td><td>3.620.637</td><td>+9,1%</td></tr>
+        <tr><td>  Caixa</td><td>839.834</td><td>604.232</td><td>+39,0%</td></tr>
+        <tr><td>  Contas a Receber</td><td>286.247</td><td>281.757</td><td>+1,6%</td></tr>
+        <tr><td>  Estoques</td><td>137.325</td><td>147.851</td><td>-7,1%</td></tr>
+        <tr><td>  Ativo Biológico</td><td>641.706</td><td>486.259</td><td>+32,0%</td></tr>
+        <tr><td>  Imobilizado</td><td>1.680.554</td><td>1.655.465</td><td>+1,5%</td></tr>
+        <tr class="highlight-row"><td><b>PASSIVO + PL</b></td><td>3.949.686</td><td>3.620.637</td><td>+9,1%</td></tr>
+        <tr><td>  Empréstimos + Debêntures (CP)</td><td>233.566</td><td>185.281</td><td>+26,1%</td></tr>
+        <tr><td>  Empréstimos + Debêntures (LP)</td><td>1.676.145</td><td>1.500.833</td><td>+11,7%</td></tr>
+        <tr><td>  Fornecedores</td><td>150.205</td><td>140.848</td><td>+6,6%</td></tr>
+        <tr><td>  IR/CSLL Diferido</td><td>220.025</td><td>190.684</td><td>+15,4%</td></tr>
+        <tr class="highlight-row"><td><b>Patrimônio Líquido</b></td><td>1.451.934</td><td>1.366.538</td><td>+6,2%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== ABA 3: OPERACIONAL ==================== -->
+<div class="tab-panel" id="operacional">
+
+  <div class="grid grid-3" style="margin-bottom:24px">
+    <div class="card">
+      <h3>Market Share Embalagens</h3>
+      <div class="value">3,8%–4,3%</div>
+      <div class="delta">5º maior do Brasil (Empapel)</div>
+    </div>
+    <div class="card">
+      <h3>Vol. Embalagens 2025 (t)</h3>
+      <div class="value">170.043</div>
+      <div class="delta down">▼ -2,5% vs 174.469 (2024)</div>
+    </div>
+    <div class="card">
+      <h3>Vol. Papel 2025 (t vendas)</h3>
+      <div class="value">127.549</div>
+      <div class="delta up">▲ +2,6% vs 124.323 (2024)</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <h3>Volume de Vendas Embalagens - Trimestral (mil t)</h3>
+      <canvas id="chartVolEmb"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Volume de Vendas Papel - Trimestral (mil t)</h3>
+      <canvas id="chartVolPapel"></canvas>
+    </div>
+  </div>
+
+  <div class="section-title">Dados Operacionais Trimestrais</div>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>Indicador</th><th>1T24</th><th>2T24</th><th>3T24</th><th>4T24</th><th>1T25</th><th>2T25</th><th>3T25</th><th>4T25</th></tr></thead>
+      <tbody>
+        <tr class="highlight-row"><td><b>Receita Líq. (R$ mi)</b></td><td>384</td><td>393</td><td>426</td><td>424</td><td>423</td><td>414</td><td>433</td><td>416</td></tr>
+        <tr><td>Embalagens - Vendas (mil t)</td><td>41,5</td><td>41,9</td><td>46,4</td><td>44,7</td><td>43,6</td><td>41,7</td><td>42,7</td><td>42,0</td></tr>
+        <tr><td>Papel - Produção (mil t)</td><td>76,4</td><td>77,4</td><td>80,8</td><td>79,2</td><td>80,0</td><td>77,5</td><td>80,8</td><td>78,8</td></tr>
+        <tr><td>Papel - Vendas (mil t)</td><td>30,4</td><td>31,7</td><td>32,9</td><td>29,3</td><td>32,9</td><td>31,0</td><td>33,2</td><td>30,5</td></tr>
+        <tr><td>  MI (mil t)</td><td>23,1</td><td>22,7</td><td>23,6</td><td>24,6</td><td>24,6</td><td>22,0</td><td>26,4</td><td>23,5</td></tr>
+        <tr><td>  ME (mil t)</td><td>7,3</td><td>9,0</td><td>9,3</td><td>4,7</td><td>8,3</td><td>9,0</td><td>6,8</td><td>7,0</td></tr>
+        <tr class="highlight-row"><td><b>EBITDA Aj. (R$ mi)</b></td><td>117</td><td>118</td><td>125</td><td>115</td><td>137</td><td>122</td><td>145</td><td>128</td></tr>
+        <tr><td>Margem EBITDA Aj.</td><td>30,5%</td><td>30,0%</td><td>29,4%</td><td>28,3%</td><td>32,4%</td><td>29,4%</td><td>33,5%</td><td>30,8%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Receita por Segmento — 2024 vs 2025 (R$ mil)</div>
+  <div class="grid grid-2">
+    <div class="card table-wrap">
+      <h3 style="margin-bottom:10px">2024</h3>
+      <table>
+        <thead><tr><th>Segmento</th><th>MI</th><th>ME</th><th>Total</th><th>%</th></tr></thead>
+        <tbody>
+          <tr><td>Embalagens (Papelão Ondulado)</td><td>951.879</td><td>—</td><td>951.879</td><td>58,5%</td></tr>
+          <tr><td>Papel p/ Embalagens</td><td>463.086</td><td>132.924</td><td>596.010</td><td>36,6%</td></tr>
+          <tr><td>Resinas (Breu/Terebintina)</td><td>8.373</td><td>71.208</td><td>79.581</td><td>4,9%</td></tr>
+          <tr class="highlight-row"><td><b>Total</b></td><td>1.423.338</td><td>204.132</td><td><b>1.627.470</b></td><td>100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card table-wrap">
+      <h3 style="margin-bottom:10px">2025</h3>
+      <table>
+        <thead><tr><th>Segmento</th><th>MI</th><th>ME</th><th>Total</th><th>%</th></tr></thead>
+        <tbody>
+          <tr><td>Embalagens (Papelão Ondulado)</td><td>~1.014.000</td><td>—</td><td>~1.014.000</td><td>~60%</td></tr>
+          <tr><td>Papel p/ Embalagens</td><td>~507.000</td><td>~153.000</td><td>~660.000</td><td>~39%</td></tr>
+          <tr><td>Florestal RS (novo)</td><td>~11.723</td><td>—</td><td>11.723</td><td>0,7%</td></tr>
+          <tr class="highlight-row"><td><b>Total</b></td><td>1.532.569</td><td>153.742</td><td><b>1.686.311</b></td><td>100%</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:.8rem;color:var(--text-light);margin-top:8px">Obs: Em 2025, a operação de Resinas foi descontinuada. Novo segmento Florestal RS.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ABA 4: VALUATION & RETORNO ==================== -->
+<div class="tab-panel" id="valuation">
+
+  <div class="grid grid-4" style="margin-bottom:24px">
+    <div class="card">
+      <h3>ROIC 2025</h3>
+      <div class="value">13,3%</div>
+      <div class="delta up">▲ +2,5pp vs 2024 (10,8%)</div>
+    </div>
+    <div class="card">
+      <h3>Spread s/ Kd</h3>
+      <div class="value">4,4 pp</div>
+      <div class="delta">ROIC 13,3% vs Kd pós-IR 8,9%</div>
+    </div>
+    <div class="card">
+      <h3>FCF Yield 2025</h3>
+      <div class="value">21,5%</div>
+      <div class="delta up">▲ +9,8pp vs 11,7% (2024)</div>
+    </div>
+    <div class="card">
+      <h3>Dividend Yield 2025</h3>
+      <div class="value">10,8%</div>
+      <div class="delta">R$ 0,73/ação pago em 2025</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <h3>ROIC vs Custo da Dívida (Kd pós-IR) — Histórico</h3>
+      <canvas id="chartROIC"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>FCL Ajustado & Yield</h3>
+      <canvas id="chartFCLYield"></canvas>
+    </div>
+  </div>
+
+  <div class="section-title">Retorno ao Acionista</div>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>Indicador</th><th>2025</th><th>2024</th><th>2023</th></tr></thead>
+      <tbody>
+        <tr><td>Dividendos + JCP Pagos (R$ mi)</td><td>169,8</td><td>126,0</td><td>205,7</td></tr>
+        <tr><td>Recompra de Ações (R$ mi)</td><td>22,1</td><td>49,2</td><td>42,0</td></tr>
+        <tr><td>Total Retornado (R$ mi)</td><td>191,8</td><td>175,2</td><td>247,7</td></tr>
+        <tr><td>Dividendo/Ação</td><td>R$ 0,73357</td><td>—</td><td>—</td></tr>
+        <tr><td>Dividend Yield</td><td>10,8%</td><td>—</td><td>—</td></tr>
+        <tr><td>Nº Total de Ações</td><td colspan="3">230.501.219 (fev/2026)</td></tr>
+        <tr><td>Ações em Tesouraria</td><td>0</td><td>6.300.800</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Plataforma Gaia — Investimentos ESG</div>
+  <div class="card">
+    <p style="font-size:.9rem;line-height:1.6">A <b>Plataforma Gaia</b> é o programa de investimentos da Irani focado em expansão, modernização e sustentabilidade. Investimentos totalizaram <b>R$ 60,1 mi em 2025</b> (R$ 61,6 mi em 2024). Destaques:</p>
+    <ul style="font-size:.85rem;line-height:1.8;margin:12px 0 0 20px">
+      <li><b>Gaia II</b> — Expansão embalagens Campina da Alegria (ramp-up concluído)</li>
+      <li><b>Gaia V</b> — Repotenciação PCH São Luiz (financiado pela 6ª Debênture Verde de R$120mi)</li>
+      <li><b>Gaia XI</b> — Reforma MP#5 na Unidade Papel SC (+7% produção / +8,4 mil t/ano) — R$84,3mi</li>
+      <li>+60 prêmios ambientais | Carteira ICO2 B3 | Índice Teva Mulheres na Liderança</li>
+      <li>Desde 2021, +20 milhões de ações recompradas (redução de 8% das ações)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== ABA 5: FONTES ==================== -->
+<div class="tab-panel" id="fontes">
+  <div class="section-title">Documentos Utilizados</div>
+  <div class="card">
+    <ul class="source-list">
+      <li><span class="tag">Release</span> Release de Resultados 1T24 — 30/04/2024</li>
+      <li><span class="tag">Release</span> Release de Resultados 2T24 — 31/07/2024</li>
+      <li><span class="tag">Release</span> Release de Resultados 3T24 — 31/10/2024</li>
+      <li><span class="tag">Release</span> Release de Resultados 4T24 / 2024 — 21/02/2025</li>
+      <li><span class="tag">Release</span> Release de Resultados 1T25 — 30/04/2025</li>
+      <li><span class="tag">Release</span> Release de Resultados 2T25 — 31/07/2025</li>
+      <li><span class="tag">Release</span> Release de Resultados 3T25 — 31/10/2025</li>
+      <li><span class="tag">Release</span> Release de Resultados 4T25 / 2025 — 23/02/2026</li>
+      <li><span class="tag">DFP/ITR</span> Demonstrações Financeiras Anuais (DFP) 2024 e 2025</li>
+      <li><span class="tag">DFP/ITR</span> ITRs trimestrais 1T24 a 3T25</li>
+      <li><span class="tag">Apresentação</span> Apresentações de Resultados 1T24 a 4T25</li>
+      <li><span class="tag">Histórico</span> Dados Históricos Consolidados 2019–2025</li>
+      <li><span class="tag">Proventos</span> Distribuição de Proventos + Informe de Rendimentos 2025–2026</li>
+      <li><span class="tag">CVM</span> Formulários de Referência 2024 e 2025</li>
+      <li><span class="tag">CVM</span> Formulários Cadastrais 2024, 2025 e 2026</li>
+      <li><span class="tag">Rating</span> S&P — brAA, perspectiva estável (fev/2024 e fev/2025)</li>
+      <li><span class="tag">Rating</span> Moody's — AA.br (primeira atribuição ago/2025)</li>
+      <li><span class="tag">Debêntures</span> 1º Aditamento à Escritura + Verificação pós-emissão 5ª Emissão</li>
+      <li><span class="tag">Governança</span> Composição acionária, administração, dados cadastrais (site RI)</li>
+    </ul>
+  </div>
+
+  <div class="section-title">Informações da Empresa</div>
+  <div class="card table-wrap">
+    <table>
+      <tbody>
+        <tr><td><b>Razão Social</b></td><td>IRANI PAPEL E EMBALAGEM S.A.</td></tr>
+        <tr><td><b>CNPJ</b></td><td>92.791.243/0001-03</td></tr>
+        <tr><td><b>Ticker</b></td><td>RANI3 (Novo Mercado - B3)</td></tr>
+        <tr><td><b>Setor</b></td><td>Embalagens — papel para embalagens sustentáveis e papelão ondulado</td></tr>
+        <tr><td><b>Sede</b></td><td>Av. Carlos Gomes, 400, Porto Alegre/RS</td></tr>
+        <tr><td><b>Auditor</b></td><td>PricewaterhouseCoopers (PwC)</td></tr>
+        <tr><td><b>CEO</b></td><td>Odivan Carlos Cargnin (desde jan/2026)</td></tr>
+        <tr><td><b>CFO / DRI</b></td><td>André Camargo de Carvalho (desde jan/2026)</td></tr>
+        <tr><td><b>Pres. Conselho</b></td><td>Péricles Pereira Druck</td></tr>
+        <tr><td><b>Website RI</b></td><td><a href="https://ri.irani.com.br" target="_blank">ri.irani.com.br</a></td></tr>
+        <tr><td><b>E-mail RI</b></td><td>ri@irani.com.br</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Administração</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3 style="margin-bottom:12px">Conselho de Administração</h3>
+      <table>
+        <tr><td>Péricles Pereira Druck</td><td>Presidente</td></tr>
+        <tr><td>Paulo Iserhard</td><td>Vice-Presidente (Independente)</td></tr>
+        <tr><td>Carlos Fernando C. O. Souto</td><td>Membro</td></tr>
+        <tr><td>Paulo Sérgio V. Mallmann</td><td>Membro</td></tr>
+        <tr><td>Roberto Faldini</td><td>Independente</td></tr>
+        <tr><td>Maria Cristina C. Ricciardi</td><td>Independente</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">Diretoria Executiva</h3>
+      <table>
+        <tr><td>Odivan Carlos Cargnin</td><td>Diretor-Presidente</td></tr>
+        <tr><td>André Camargo de Carvalho</td><td>Dir. Adm., Finanças e RI</td></tr>
+      </table>
+      <h3 style="margin:16px 0 12px">Conselho Fiscal</h3>
+      <table>
+        <tr><td>Renê Sanda</td><td>Presidente</td></tr>
+        <tr><td>Rosângela Costa Süffert</td><td>Membro</td></tr>
+        <tr><td>Letícia Pedercini Issa</td><td>Membro</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// Tab logic
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  });
+});
+
+const GREEN = '#2e7d32', GREEN_L = '#66bb6a', BLUE = '#1565c0', ORANGE = '#ef6c00', RED = '#c62828', GREY = '#90a4ae';
+
+// Chart defaults
+Chart.defaults.font.family = "'Segoe UI', sans-serif";
+Chart.defaults.font.size = 12;
+
+// 1. Receita Trimestral
+const quarters = ['1T24','2T24','3T24','4T24','1T25','2T25','3T25','4T25'];
+new Chart(document.getElementById('chartReceita'), {
+  type: 'bar',
+  data: {
+    labels: quarters,
+    datasets: [{
+      label: 'Receita Líquida (R$ mi)',
+      data: [384, 393, 426, 424, 423, 414, 433, 416],
+      backgroundColor: GREEN_L, borderColor: GREEN, borderWidth: 1, borderRadius: 4
+    }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, min: 350 } } }
+});
+
+// 2. EBITDA & Margem
+new Chart(document.getElementById('chartEbitda'), {
+  type: 'bar',
+  data: {
+    labels: quarters,
+    datasets: [
+      { label: 'EBITDA Aj. (R$ mi)', data: [117, 118, 125, 115, 137, 122, 145, 128], backgroundColor: GREEN_L, borderRadius: 4, yAxisID: 'y' },
+      { label: 'Margem %', data: [30.5, 30.0, 29.4, 28.3, 32.4, 29.4, 33.5, 30.8], type: 'line', borderColor: ORANGE, backgroundColor: 'transparent', pointRadius: 4, yAxisID: 'y1' }
+    ]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: false, min: 100, position: 'left' },
+      y1: { beginAtZero: false, min: 25, max: 38, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// 3. Lucro Líquido
+new Chart(document.getElementById('chartLL'), {
+  type: 'bar',
+  data: {
+    labels: quarters,
+    datasets: [{
+      label: 'Lucro Líquido (R$ mi)',
+      data: [41, 40, 38, 186, 59, 104, 41, 38],
+      backgroundColor: quarters.map((q,i) => i === 3 ? ORANGE : GREEN_L),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { afterLabel: (ctx) => ctx.dataIndex === 3 ? 'Inclui crédito tributário não recorrente' : '' } }
+    },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+
+// 4. FCL
+new Chart(document.getElementById('chartFCL'), {
+  type: 'bar',
+  data: {
+    labels: ['2023', '2024', '2025'],
+    datasets: [{
+      label: 'FCL Ajustado (R$ mi)',
+      data: [266, 238, 387],
+      backgroundColor: [GREY, GREEN_L, GREEN],
+      borderRadius: 6
+    }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+// 5. Margens
+new Chart(document.getElementById('chartMargens'), {
+  type: 'line',
+  data: {
+    labels: quarters,
+    datasets: [
+      { label: 'Margem Bruta', data: [40.7,39.9,36.6,36.9,41.1,52.2,36.3,36.8], borderColor: BLUE, backgroundColor:'transparent', pointRadius:4, tension:.2 },
+      { label: 'Margem EBITDA Aj.', data: [30.5,30.0,29.4,28.3,32.4,29.4,33.5,30.8], borderColor: GREEN, backgroundColor:'transparent', pointRadius:4, tension:.2 }
+    ]
+  },
+  options: { scales: { y: { ticks: { callback: v => v + '%' } } } }
+});
+
+// 6. Dívida & Alavancagem
+const years = ['2020','2021','2022','2023','2024','2025'];
+new Chart(document.getElementById('chartDivida'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Dívida Líquida (R$ mi)', data: [242,386,742,1018,1077,1058], backgroundColor: RED+'90', borderRadius: 4, yAxisID: 'y' },
+      { label: 'EBITDA Aj. (R$ mi)', data: [226,496,538,490,476,532], backgroundColor: GREEN_L+'90', borderRadius: 4, yAxisID: 'y' },
+      { label: 'DL/EBITDA (x)', data: [1.07,0.78,1.38,2.07,2.26,1.99], type: 'line', borderColor: ORANGE, backgroundColor:'transparent', pointRadius:5, yAxisID: 'y1' }
+    ]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: true, position: 'left' },
+      y1: { beginAtZero: true, max: 3, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + 'x' } }
+    }
+  }
+});
+
+// 7. Caixa vs Dívida Bruta
+new Chart(document.getElementById('chartCaixaDivBruta'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Caixa (R$ mi)', data: [346,506,1049,601,604,840], backgroundColor: GREEN_L, borderRadius: 4 },
+      { label: 'Dívida Bruta (R$ mi)', data: [588,893,1791,1619,1681,1898], backgroundColor: RED+'70', borderRadius: 4 }
+    ]
+  },
+  options: { scales: { y: { beginAtZero: true } } }
+});
+
+// 8. Perfil dívida (pie)
+new Chart(document.getElementById('chartPerfil'), {
+  type: 'doughnut',
+  data: { labels: ['Longo Prazo (88%)','Curto Prazo (12%)'], datasets: [{ data: [88,12], backgroundColor: [GREEN, ORANGE] }] },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+// 9. Moeda (pie)
+new Chart(document.getElementById('chartMoeda'), {
+  type: 'doughnut',
+  data: { labels: ['Moeda Local (99%)','Moeda Estrangeira (1%)'], datasets: [{ data: [99,1], backgroundColor: [BLUE, GREY] }] },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+// 10. Acionistas
+new Chart(document.getElementById('chartAcionistas'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Irani Participações (48,9%)','Free Float (44,0%)','Habitasul Des. Imob. (5,8%)','Outros (1,3%)'],
+    datasets: [{ data: [48.86, 44.04, 5.84, 1.26], backgroundColor: [GREEN, BLUE, ORANGE, GREY] }]
+  },
+  options: { plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+});
+
+// 11. Volume Embalagens
+new Chart(document.getElementById('chartVolEmb'), {
+  type: 'bar',
+  data: {
+    labels: quarters,
+    datasets: [{ label: 'mil t', data: [41.5,41.9,46.4,44.7,43.6,41.7,42.7,42.0], backgroundColor: GREEN_L, borderRadius: 4 }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { min: 38 } } }
+});
+
+// 12. Volume Papel
+new Chart(document.getElementById('chartVolPapel'), {
+  type: 'bar',
+  data: {
+    labels: quarters,
+    datasets: [
+      { label: 'MI (mil t)', data: [23.1,22.7,23.6,24.6,24.6,22.0,26.4,23.5], backgroundColor: GREEN_L, borderRadius: 4 },
+      { label: 'ME (mil t)', data: [7.3,9.0,9.3,4.7,8.3,9.0,6.8,7.0], backgroundColor: BLUE+'80', borderRadius: 4 }
+    ]
+  },
+  options: { scales: { x: { stacked: true }, y: { stacked: true } } }
+});
+
+// 13. ROIC vs Kd
+new Chart(document.getElementById('chartROIC'), {
+  type: 'line',
+  data: {
+    labels: ['2019','2020','2021','2022','2023','2024','2025'],
+    datasets: [
+      { label: 'ROIC', data: [16.1,12.6,24.9,23.0,16.6,10.8,13.3], borderColor: GREEN, backgroundColor:'transparent', pointRadius:5, tension:.2 },
+      { label: 'Kd pós-IR', data: [6.8,6.0,6.5,9.1,9.6,7.6,8.9], borderColor: RED, backgroundColor:'transparent', pointRadius:5, tension:.2, borderDash:[5,5] }
+    ]
+  },
+  options: { scales: { y: { ticks: { callback: v => v + '%' } } } }
+});
+
+// 14. FCL Yield
+new Chart(document.getElementById('chartFCLYield'), {
+  type: 'bar',
+  data: {
+    labels: ['2023','2024','2025'],
+    datasets: [
+      { label: 'FCL Aj. (R$ mi)', data: [266, 238, 387], backgroundColor: GREEN_L, borderRadius: 4, yAxisID: 'y' },
+      { label: 'FCF Yield %', data: [11.4, 11.7, 21.5], type: 'line', borderColor: ORANGE, backgroundColor:'transparent', pointRadius:5, yAxisID: 'y1' }
+    ]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: true, position: 'left' },
+      y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
