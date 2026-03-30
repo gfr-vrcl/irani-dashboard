@@ -43,6 +43,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 .main-tab[data-color="blue"].active { border-bottom-color: #42a5f5; }
 .main-tab[data-color="teal"].active { border-bottom-color: #26a69a; }
 .main-tab[data-color="purple"].active { border-bottom-color: #ab47bc; }
+.main-tab[data-color="orange"].active { border-bottom-color: #ff9800; }
 
 /* Sub tabs */
 .sub-tabs {
@@ -150,7 +151,7 @@ tr:hover td { background: #f5f7f0; }
     <div class="subtitle">Irani (RANI3) · Klabin (KLBN11) · Suzano (SUZB3) — Resultados 2024–2025</div>
   </div>
   <div class="badges">
-    <div class="badge">Atualizado: Mar/2026</div>
+    <div class="badge">Atualizado: 30/03/2026</div>
     <div class="badge">Dados: Releases 4T25 + Fundamentus</div>
   </div>
 </div>
@@ -160,6 +161,7 @@ tr:hover td { background: #f5f7f0; }
   <div class="main-tab" data-main="klabin" data-color="blue">📦 Klabin (KLBN11)</div>
   <div class="main-tab" data-main="suzano" data-color="teal">🌿 Suzano (SUZB3)</div>
   <div class="main-tab" data-main="compare" data-color="purple">⚖️ Comparativo</div>
+  <div class="main-tab" data-main="bolsa" data-color="orange">📈 Bolsa</div>
 </div>
 
 <!-- ====================================================================== -->
@@ -815,6 +817,66 @@ tr:hover td { background: #f5f7f0; }
 
 </div></div>
 
+<!-- ====================================================================== -->
+<!-- BOLSA -->
+<!-- ====================================================================== -->
+<div class="main-panel" id="bolsa">
+<div class="content">
+  <div class="company-strip" style="background: linear-gradient(135deg, #e65100, #ff9800);">
+    <div>
+      <h2>📈 Cotações B3 — Últimos 5 Anos</h2>
+      <div class="info">RANI3 · KLBN11 · SUZB3 — Cotações mensais (Abr/2021 – Mar/2026)</div>
+    </div>
+    <div class="strip-badges">
+      <div class="strip-badge">Fonte: Yahoo Finance</div>
+      <div class="strip-badge">Intervalo: Mensal</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="border-bottom-color:#ff9800">Cotações Absolutas (R$)</div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <h3>Preço de Fechamento Mensal — Escala Dupla</h3>
+    <canvas id="bolsaAbsoluto" style="max-height:420px"></canvas>
+  </div>
+
+  <div class="section-title" style="border-bottom-color:#ff9800">Rentabilidade Acumulada (%)</div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <h3>Retorno Acumulado — Base 100 (Abr/2021 = 100%)</h3>
+    <canvas id="bolsaRetorno" style="max-height:420px"></canvas>
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:20px">
+    <div class="card">
+      <h3>🌲 RANI3 — Retorno 5 Anos</h3>
+      <div class="value" id="retornoRani" style="color:#2e7d32"></div>
+      <div class="delta" id="deltaRani"></div>
+    </div>
+    <div class="card">
+      <h3>📦 KLBN11 — Retorno 5 Anos</h3>
+      <div class="value" id="retornoKlabin" style="color:#1565c0"></div>
+      <div class="delta" id="deltaKlabin"></div>
+    </div>
+    <div class="card">
+      <h3>🌿 SUZB3 — Retorno 5 Anos</h3>
+      <div class="value" id="retornoSuzano" style="color:#00695c"></div>
+      <div class="delta" id="deltaSuzano"></div>
+    </div>
+  </div>
+
+  <div class="section-title" style="border-bottom-color:#ff9800">Tabela de Cotações Mensais</div>
+  <div class="card table-wrap">
+    <table id="bolsaTable">
+      <thead><tr><th>Mês</th><th>🌲 RANI3</th><th>📦 KLBN11</th><th>🌿 SUZB3</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="note" style="margin-top:16px">
+    <b>Nota:</b> Cotações de fechamento mensal ajustadas. Última atualização: Mar/2026. Os retornos não incluem dividendos reinvestidos (retorno de preço, não retorno total).
+  </div>
+</div>
+</div>
+
 <script>
 // === TAB LOGIC ===
 document.querySelectorAll('.main-tab').forEach(t => {
@@ -1105,6 +1167,95 @@ new Chart(document.getElementById('cmpCapStruct'), {
   ]},
   options:{scales:{y:{ticks:{callback:v=>'R$ '+v+'bi'}}}}
 });
+
+// =============================================
+// BOLSA CHARTS
+// =============================================
+const bolsaLabels = ['Abr/21','Mai/21','Jun/21','Jul/21','Ago/21','Set/21','Out/21','Nov/21','Dez/21',
+  'Jan/22','Fev/22','Mar/22','Abr/22','Mai/22','Jun/22','Jul/22','Ago/22','Set/22','Out/22','Nov/22','Dez/22',
+  'Jan/23','Fev/23','Mar/23','Abr/23','Mai/23','Jun/23','Jul/23','Ago/23','Set/23','Out/23','Nov/23','Dez/23',
+  'Jan/24','Fev/24','Mar/24','Abr/24','Mai/24','Jun/24','Jul/24','Ago/24','Set/24','Out/24','Nov/24','Dez/24',
+  'Jan/25','Fev/25','Mar/25','Abr/25','Mai/25','Jun/25','Jul/25','Ago/25','Set/25','Out/25','Nov/25','Dez/25',
+  'Jan/26','Fev/26','Mar/26'];
+
+const rani3 = [6.86,8.40,9.27,8.09,6.94,6.24,6.40,7.04,6.98,6.42,6.09,6.80,6.44,7.43,6.67,6.90,7.61,7.92,8.54,8.70,8.05,7.94,8.58,8.62,8.68,8.32,9.27,10.20,10.98,12.67,10.80,10.28,10.92,9.74,9.10,9.21,9.01,8.48,8.47,8.44,7.99,7.41,7.57,7.09,6.82,7.30,7.27,7.21,8.03,7.47,7.27,7.46,8.02,8.34,8.92,8.73,8.68,9.09,9.84,9.42];
+const klbn11 = [25.09,23.72,23.71,22.15,23.68,21.79,20.65,21.43,23.15,22.57,20.59,21.71,18.67,20.05,18.18,17.94,16.95,16.34,19.46,17.63,17.97,17.55,17.57,16.28,17.22,18.94,19.59,20.70,20.49,21.43,19.26,20.32,20.00,19.16,20.32,22.74,20.74,20.12,21.23,21.87,21.38,20.68,20.65,21.99,22.97,22.22,19.57,18.48,18.35,18.13,18.27,18.42,18.33,17.86,17.86,17.56,18.76,19.16,20.56,19.21];
+const suzb3 = [68.67,60.73,59.81,54.07,61.00,54.52,49.23,56.16,59.98,59.20,55.07,55.15,49.61,53.50,49.69,48.29,44.26,44.50,53.20,53.15,48.24,46.36,47.74,41.60,39.80,44.78,44.22,48.07,50.15,54.28,51.57,53.78,55.63,51.62,56.35,63.98,58.46,48.70,57.01,53.86,55.00,54.44,59.77,62.40,61.78,62.37,56.31,52.94,50.08,49.65,51.21,52.15,52.45,49.90,48.89,47.58,51.45,49.33,58.00,50.44];
+
+// Absolute price chart (dual axis: RANI3 on left, KLBN11+SUZB3 on right)
+new Chart(document.getElementById('bolsaAbsoluto'), {
+  type:'line',
+  data:{
+    labels: bolsaLabels,
+    datasets:[
+      {label:'RANI3 (R$)',data:rani3,borderColor:C.irani,backgroundColor:C.irani+'15',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5,yAxisID:'y'},
+      {label:'KLBN11 (R$)',data:klbn11,borderColor:C.klabin,backgroundColor:'transparent',tension:.3,pointRadius:1.5,borderWidth:2.5,yAxisID:'y1'},
+      {label:'SUZB3 (R$)',data:suzb3,borderColor:C.suzano,backgroundColor:'transparent',tension:.3,pointRadius:1.5,borderWidth:2.5,yAxisID:'y1'}
+    ]
+  },
+  options:{
+    interaction:{mode:'index',intersect:false},
+    plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(2)}`}}},
+    scales:{
+      x:{ticks:{maxTicksLimit:15,maxRotation:45}},
+      y:{position:'left',title:{display:true,text:'RANI3 (R$)'},ticks:{callback:v=>'R$ '+v.toFixed(0)},grid:{drawOnChartArea:true}},
+      y1:{position:'right',title:{display:true,text:'KLBN11 / SUZB3 (R$)'},ticks:{callback:v=>'R$ '+v.toFixed(0)},grid:{drawOnChartArea:false}}
+    }
+  }
+});
+
+// Return chart (base 100)
+const rani3Ret = rani3.map(v=>(v/rani3[0]*100).toFixed(1)*1);
+const klbn11Ret = klbn11.map(v=>(v/klbn11[0]*100).toFixed(1)*1);
+const suzb3Ret = suzb3.map(v=>(v/suzb3[0]*100).toFixed(1)*1);
+
+new Chart(document.getElementById('bolsaRetorno'), {
+  type:'line',
+  data:{
+    labels: bolsaLabels,
+    datasets:[
+      {label:'RANI3',data:rani3Ret,borderColor:C.irani,backgroundColor:C.irani+'15',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5},
+      {label:'KLBN11',data:klbn11Ret,borderColor:C.klabin,backgroundColor:C.klabin+'10',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5},
+      {label:'SUZB3',data:suzb3Ret,borderColor:C.suzano,backgroundColor:C.suzano+'10',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5}
+    ]
+  },
+  options:{
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}},
+      annotation:{annotations:{baseline:{type:'line',yMin:100,yMax:100,borderColor:'#999',borderDash:[6,4],borderWidth:1,label:{display:true,content:'Base 100',position:'start',font:{size:10}}}}}
+    },
+    scales:{
+      x:{ticks:{maxTicksLimit:15,maxRotation:45}},
+      y:{ticks:{callback:v=>v+'%'}}
+    }
+  }
+});
+
+// Return summary cards
+const lastRani = rani3Ret[rani3Ret.length-1];
+const lastKlabin = klbn11Ret[klbn11Ret.length-1];
+const lastSuzano = suzb3Ret[suzb3Ret.length-1];
+
+document.getElementById('retornoRani').textContent = (lastRani-100>0?'+':'')+(lastRani-100).toFixed(1)+'%';
+document.getElementById('retornoKlabin').textContent = (lastKlabin-100>0?'+':'')+(lastKlabin-100).toFixed(1)+'%';
+document.getElementById('retornoSuzano').textContent = (lastSuzano-100>0?'+':'')+(lastSuzano-100).toFixed(1)+'%';
+document.getElementById('deltaRani').textContent = `R$ ${rani3[0].toFixed(2)} → R$ ${rani3[rani3.length-1].toFixed(2)}`;
+document.getElementById('deltaRani').className = 'delta '+(lastRani>=100?'up':'down');
+document.getElementById('deltaKlabin').textContent = `R$ ${klbn11[0].toFixed(2)} → R$ ${klbn11[klbn11.length-1].toFixed(2)}`;
+document.getElementById('deltaKlabin').className = 'delta '+(lastKlabin>=100?'up':'down');
+document.getElementById('deltaSuzano').textContent = `R$ ${suzb3[0].toFixed(2)} → R$ ${suzb3[suzb3.length-1].toFixed(2)}`;
+document.getElementById('deltaSuzano').className = 'delta '+(lastSuzano>=100?'up':'down');
+
+// Populate table
+(function(){
+  const tbody = document.querySelector('#bolsaTable tbody');
+  for(let i=bolsaLabels.length-1; i>=0; i--){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${bolsaLabels[i]}</td><td>R$ ${rani3[i].toFixed(2)}</td><td>R$ ${klbn11[i].toFixed(2)}</td><td>R$ ${suzb3[i].toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  }
+})();
 </script>
 </body>
 </html>
