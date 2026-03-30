@@ -848,7 +848,7 @@ tr:hover td { background: #f5f7f0; }
   <div class="grid grid-3" style="margin-bottom:20px">
     <div class="card">
       <h3>🌲 RANI3 — Retorno 5 Anos</h3>
-      <div class="value" id="retornoRani" style="color:#2e7d32"></div>
+      <div class="value" id="retornoRani" style="color:#e91e63"></div>
       <div class="delta" id="deltaRani"></div>
     </div>
     <div class="card">
@@ -858,7 +858,7 @@ tr:hover td { background: #f5f7f0; }
     </div>
     <div class="card">
       <h3>🌿 SUZB3 — Retorno 5 Anos</h3>
-      <div class="value" id="retornoSuzano" style="color:#00695c"></div>
+      <div class="value" id="retornoSuzano" style="color:#f9a825"></div>
       <div class="delta" id="deltaSuzano"></div>
     </div>
   </div>
@@ -1188,9 +1188,9 @@ new Chart(document.getElementById('bolsaAbsoluto'), {
   data:{
     labels: bolsaLabels,
     datasets:[
-      {label:'RANI3 (R$)',data:rani3,borderColor:C.irani,backgroundColor:C.irani+'15',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5,yAxisID:'y'},
-      {label:'KLBN11 (R$)',data:klbn11,borderColor:C.klabin,backgroundColor:'transparent',tension:.3,pointRadius:1.5,borderWidth:2.5,yAxisID:'y1'},
-      {label:'SUZB3 (R$)',data:suzb3,borderColor:C.suzano,backgroundColor:'transparent',tension:.3,pointRadius:1.5,borderWidth:2.5,yAxisID:'y1'}
+      {label:'RANI3 (R$)',data:rani3,borderColor:'#e91e63',backgroundColor:'#e91e6320',fill:true,tension:.3,pointRadius:2,borderWidth:3,yAxisID:'y'},
+      {label:'KLBN11 (R$)',data:klbn11,borderColor:'#1565c0',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:3,yAxisID:'y1'},
+      {label:'SUZB3 (R$)',data:suzb3,borderColor:'#f9a825',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:3,yAxisID:'y1'}
     ]
   },
   options:{
@@ -1198,8 +1198,8 @@ new Chart(document.getElementById('bolsaAbsoluto'), {
     plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(2)}`}}},
     scales:{
       x:{ticks:{maxTicksLimit:15,maxRotation:45}},
-      y:{position:'left',title:{display:true,text:'RANI3 (R$)'},ticks:{callback:v=>'R$ '+v.toFixed(0)},grid:{drawOnChartArea:true}},
-      y1:{position:'right',title:{display:true,text:'KLBN11 / SUZB3 (R$)'},ticks:{callback:v=>'R$ '+v.toFixed(0)},grid:{drawOnChartArea:false}}
+      y:{position:'left',title:{display:true,text:'RANI3 (R$)',color:'#e91e63',font:{weight:'bold'}},ticks:{callback:v=>'R$ '+v.toFixed(0),color:'#e91e63'},grid:{drawOnChartArea:true}},
+      y1:{position:'right',title:{display:true,text:'KLBN11 / SUZB3 (R$)',font:{weight:'bold'}},ticks:{callback:v=>'R$ '+v.toFixed(0)},grid:{drawOnChartArea:false}}
     }
   }
 });
@@ -1214,9 +1214,9 @@ new Chart(document.getElementById('bolsaRetorno'), {
   data:{
     labels: bolsaLabels,
     datasets:[
-      {label:'RANI3',data:rani3Ret,borderColor:C.irani,backgroundColor:C.irani+'15',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5},
-      {label:'KLBN11',data:klbn11Ret,borderColor:C.klabin,backgroundColor:C.klabin+'10',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5},
-      {label:'SUZB3',data:suzb3Ret,borderColor:C.suzano,backgroundColor:C.suzano+'10',fill:true,tension:.3,pointRadius:1.5,borderWidth:2.5}
+      {label:'RANI3',data:rani3Ret,borderColor:'#e91e63',backgroundColor:'#e91e6315',fill:true,tension:.3,pointRadius:2,borderWidth:3},
+      {label:'KLBN11',data:klbn11Ret,borderColor:'#1565c0',backgroundColor:'#1565c010',fill:true,tension:.3,pointRadius:2,borderWidth:3},
+      {label:'SUZB3',data:suzb3Ret,borderColor:'#f9a825',backgroundColor:'#f9a82510',fill:true,tension:.3,pointRadius:2,borderWidth:3}
     ]
   },
   options:{
