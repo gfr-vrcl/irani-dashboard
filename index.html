@@ -171,6 +171,7 @@ tr:hover td { background: #f5f7f0; }
 <div class="sub-tabs">
   <div class="sub-tab active" data-sub="irani-res">📊 Resultados</div>
   <div class="sub-tab" data-sub="irani-cap">🏦 Estrutura de Capital</div>
+  <div class="sub-tab" data-sub="irani-exercicio">📝 Exercício</div>
   <div class="sub-tab" data-sub="irani-fontes">📋 Fontes</div>
 </div>
 <div class="content">
@@ -320,6 +321,174 @@ tr:hover td { background: #f5f7f0; }
       </table>
     </div>
   </div>
+</div>
+
+<!-- IRANI EXERCÍCIO -->
+<div class="sub-panel" id="irani-exercicio">
+
+  <div class="section-title">Análise Histórica — Acumulado Anual (Consolidado, R$ mil)</div>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>Linha</th><th>2024</th><th>2025</th><th>Var.</th></tr></thead>
+      <tbody>
+        <tr class="highlight-row"><td>Receita Líquida (DRE)</td><td>1.555.346</td><td>1.686.311</td><td>+8,4%</td></tr>
+        <tr class="highlight-row"><td>EBIT (Lucro Operacional)</td><td>328.931</td><td>447.806</td><td>+36,1%</td></tr>
+        <tr><td>(+) Depreciação, Amort. e Exaustão</td><td>195.234</td><td>204.753</td><td>+4,9%</td></tr>
+        <tr class="highlight-row"><td><b>= EBITDA (calculado)</b></td><td><b>524.165</b></td><td><b>652.559</b></td><td><b>+24,5%</b></td></tr>
+        <tr class="highlight-row"><td>EBITDA Ajustado (reportado, OC+OD)</td><td>483.924</td><td>539.031</td><td>+11,4%</td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr>
+        <tr><td><b>Custos e Despesas Operacionais:</b></td><td></td><td></td><td></td></tr>
+        <tr><td>  CPV</td><td>1.013.128</td><td>1.102.869</td><td>+8,9%</td></tr>
+        <tr><td>  Despesas com Vendas</td><td>132.397</td><td>127.554</td><td>-3,7%</td></tr>
+        <tr><td>  Despesas G&A</td><td>119.312</td><td>117.545</td><td>-1,5%</td></tr>
+        <tr><td>  Participação Admin.</td><td>19.523</td><td>19.586</td><td>+0,3%</td></tr>
+        <tr><td>  Outras Desp. (Líq.)</td><td>25.541</td><td>(11.911)</td><td>n/a</td></tr>
+        <tr class="highlight-row"><td><b>= Total Custos e Despesas</b></td><td><b>1.309.901</b></td><td><b>1.355.643</b></td><td><b>+3,5%</b></td></tr>
+        <tr><td></td><td></td><td></td><td></td></tr>
+        <tr class="highlight-row"><td>Caixa e Equivalentes</td><td>604.232</td><td>839.834</td><td>+39,0%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Nº de Dias de Despesas no Caixa</div>
+  <div class="note">⚠️ <b>Inferência:</b> Despesas diárias = Total Custos+Despesas Operacionais ÷ 365. Nº de Dias = Caixa ÷ Despesa Diária.</div>
+  <div class="grid grid-2">
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Indicador</th><th>2024</th><th>2025</th></tr></thead>
+        <tbody>
+          <tr><td>Total Custos e Despesas Oper.</td><td>1.309.901</td><td>1.355.643</td></tr>
+          <tr><td>Despesa Diária Média (÷365)</td><td>3.589</td><td>3.714</td></tr>
+          <tr><td>Caixa e Equivalentes</td><td>604.232</td><td>839.834</td></tr>
+          <tr class="highlight-row"><td><b>= Nº Dias de Despesas no Caixa</b></td><td><b>168 dias</b></td><td><b>226 dias</b></td></tr>
+          <tr><td></td><td></td><td></td></tr>
+          <tr><td>Mínimo Política (R$300M)</td><td>84 dias</td><td>81 dias</td></tr>
+          <tr><td>Ideal Estimado (benchmark setor)</td><td>150 dias</td><td>150 dias</td></tr>
+          <tr class="highlight-row"><td><b>Média Histórica</b></td><td colspan="2" style="text-align:center"><b>197 dias</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-card"><h3>Dias de Despesas no Caixa vs Benchmarks</h3><canvas id="iraniDiasCaixa"></canvas></div>
+  </div>
+  <div class="note">⚠️ <b>Inferência — Nº ideal de dias:</b> A Irani possui política formal de caixa mínimo de R$ 300 milhões (~81 dias em 2025). Benchmarks setoriais para empresas de capital intensivo com dívida relevante sugerem 120–180 dias. O caixa atual de 226 dias excede o necessário — parte explicada pela captação da 6ª Debênture Verde (R$120M) no 4T25 para Projeto Gaia V. Excesso estimado: ~R$ 282 milhões acima do ideal (150 dias).</div>
+
+  <div class="section-title">Dados Específicos do Exercício (31/12/2025)</div>
+  <div class="grid grid-2">
+    <div class="card table-wrap">
+      <table>
+        <tbody>
+          <tr><td><b>Data de Publicação</b></td><td>23/02/2026</td></tr>
+          <tr><td><b>Lucro Operacional (EBIT)</b></td><td>R$ 447.806 mil</td></tr>
+          <tr><td><b>Spread sobre CDI (credores)</b></td><td>CDI - 0,7% (2025) vs CDI + 0,3% (2024)</td></tr>
+          <tr><td><b>Taxa CDI futuro (Focus 2026)</b></td><td>~12,25% a.a.</td></tr>
+          <tr><td><b>Alíquota de IR</b></td><td>34%</td></tr>
+          <tr><td><b>Dívida de Curto Prazo</b></td><td>R$ 233.566 mil</td></tr>
+          <tr><td><b>Dívida de Longo Prazo</b></td><td>R$ 1.676.145 mil</td></tr>
+          <tr><td><b>Caixa e Equivalentes</b></td><td>R$ 839.834 mil</td></tr>
+          <tr><td><b>Depreciação, Amort. e Exaustão</b></td><td>R$ 204.753 mil</td></tr>
+          <tr><td><b>Índice Cobertura Juros (EBITDA/Desp.Fin.Líq.)</b></td><td>4,03x (apurado) / Mín. 2,0x (covenant)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card table-wrap">
+      <table>
+        <tbody>
+          <tr><td><b>Spread no Índice de Cobertura</b></td><td>2,03x acima do covenant mínimo</td></tr>
+          <tr><td><b>Quantidade de Ações ON</b></td><td>230.501.219</td></tr>
+          <tr><td><b>Preço da Ação (31/12/2025)</b></td><td>R$ 8,68</td></tr>
+          <tr><td><b>Valor de Mercado</b></td><td>R$ 2.000.751 mil</td></tr>
+          <tr><td><b>Receita Bruta</b></td><td>R$ 2.179.912 mil</td></tr>
+          <tr><td><b>Receita Líquida</b></td><td>R$ 1.686.311 mil</td></tr>
+          <tr><td><b>Patrimônio Líquido</b></td><td>R$ 1.451.934 mil</td></tr>
+          <tr><td><b>Custo Capital Próprio (CAPM)</b></td><td>13,28% pós IR (15,38% pré IR)</td></tr>
+          <tr><td><b>Beta (estimado small cap B3)</b></td><td>~0,8–1,0</td></tr>
+          <tr><td><b>Prêmio Risco de Mercado</b></td><td>~5–7% (típico Brasil)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="note">⚠️ Beta e Prêmio de Risco não são divulgados explicitamente pela empresa. A Irani usa CAPM para teste de impairment do goodwill (WACC de 13,28% pós-IR, conforme NE 15).</div>
+
+  <div class="section-title">Covenants e Métricas de Risco</div>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>Covenant</th><th>Limite</th><th>Apurado 2025</th><th>Folga</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>DL/EBITDA — 4ª Debênture</td><td>≤ 3,50x</td><td>1,99x</td><td style="color:var(--green);font-weight:700">1,51x</td><td>✅ OK</td></tr>
+        <tr><td>DL/EBITDA — 5ª Debênture</td><td>≤ 4,00x</td><td>1,99x</td><td style="color:var(--green);font-weight:700">2,01x</td><td>✅ OK</td></tr>
+        <tr><td>DL/EBITDA — 6ª Debênture</td><td>≤ 4,00x</td><td>1,99x</td><td style="color:var(--green);font-weight:700">2,01x</td><td>✅ OK</td></tr>
+        <tr><td>DL/EBITDA — Itaú NCE</td><td>≤ 4,00x</td><td>1,99x</td><td style="color:var(--green);font-weight:700">2,01x</td><td>✅ OK</td></tr>
+        <tr><td>DL/EBITDA — Santander CDCA</td><td>≤ 4,00x</td><td>1,99x</td><td style="color:var(--green);font-weight:700">2,01x</td><td>✅ OK</td></tr>
+        <tr><td>DL/EBITDA — Safra CCB</td><td>≤ 4,00x</td><td>1,99x</td><td style="color:var(--green);font-weight:700">2,01x</td><td>✅ OK</td></tr>
+        <tr><td>EBITDA/Desp.Fin.Líq. — 4ª Deb.</td><td>≥ 2,00x</td><td>4,03x</td><td style="color:var(--green);font-weight:700">2,03x</td><td>✅ OK</td></tr>
+        <tr><td>Caixa Mínimo (Política)</td><td>≥ R$300M</td><td>R$840M</td><td style="color:var(--green);font-weight:700">R$540M</td><td>✅ OK</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Composição Detalhada da Dívida (R$ mil — 31/12/2025)</div>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>Instrumento</th><th>Taxa</th><th>Curto Prazo</th><th>Longo Prazo</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td><b>Empréstimos e Financiamentos</b></td><td></td><td><b>172.614</b></td><td><b>787.967</b></td><td><b>960.581</b></td></tr>
+        <tr><td>  Finame (BNDES)</td><td>IPCA + 5,4%~5,6%</td><td>44.116</td><td>424.639</td><td>468.755</td></tr>
+        <tr><td>  Capital de Giro</td><td>CDI + 1,0%</td><td>105.844</td><td>363.328</td><td>469.172</td></tr>
+        <tr><td>  ACC (moeda estrangeira)</td><td>Fixo 5,47%</td><td>22.654</td><td>—</td><td>22.654</td></tr>
+        <tr><td><b>Debêntures</b></td><td></td><td><b>60.952</b></td><td><b>888.178</b></td><td><b>949.130</b></td></tr>
+        <tr><td>  4ª Emissão (Green Bond)</td><td>IPCA+5,5% → CDI+0,71% (swap)</td><td>19.718</td><td>58.769</td><td>78.487</td></tr>
+        <tr><td>  5ª Emissão (CRA Verde)</td><td>CDI+1,40% / CDI+1,75%</td><td>40.061</td><td>714.864</td><td>754.925</td></tr>
+        <tr><td>  6ª Emissão (Green Bond)</td><td>IPCA+6,65% → CDI-1,13% (swap)</td><td>1.173</td><td>114.545</td><td>115.718</td></tr>
+        <tr class="highlight-row"><td><b>TOTAL DÍVIDA BRUTA</b></td><td></td><td><b>233.566</b></td><td><b>1.676.145</b></td><td><b>1.909.711</b></td></tr>
+        <tr><td>(-) Caixa e Equivalentes</td><td></td><td></td><td></td><td>(839.834)</td></tr>
+        <tr class="highlight-row"><td><b>= DÍVIDA LÍQUIDA</b></td><td></td><td></td><td></td><td><b>1.057.881</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Insights: Endividamento, Análise Futura e Recomendações</div>
+  <div class="grid grid-3">
+    <div class="card" style="border-left:4px solid var(--green)">
+      <h3 style="color:var(--green)">🟢 Pontos Positivos</h3>
+      <ul style="font-size:.83rem;line-height:1.7;padding-left:16px">
+        <li>Desalavancagem: DL/EBITDA 2,26x → 1,99x</li>
+        <li>Todos covenants com folga >1,5x</li>
+        <li>Custo dívida melhorou: CDI-0,7% (era CDI+0,3%)</li>
+        <li>ROIC 13,3% com spread +4,4pp sobre Kd pós IR</li>
+        <li>FCL Ajustado Yield 21,5% — geração excepcional</li>
+        <li>Dividend Yield 10,8% + recompra de ações</li>
+        <li>88% da dívida LP, 99% em moeda nacional</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--orange)">
+      <h3 style="color:var(--orange)">🟡 Pontos de Atenção</h3>
+      <ul style="font-size:.83rem;line-height:1.7;padding-left:16px">
+        <li>Caixa de R$840M = 226 dias (acima do ideal ~150)</li>
+        <li>Selic projetada 12,25% em 2026 — pressão no resultado financeiro</li>
+        <li>LL caiu 20,5% pela ausência de crédito tributário NR de 2024</li>
+        <li>5ª Debênture (R$755M) a CDI+1,4%/1,75% — dívida mais cara</li>
+        <li>Cenário eleitoral 2026 pode trazer volatilidade</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--blue)">
+      <h3 style="color:var(--blue)">🔵 Recomendações</h3>
+      <ul style="font-size:.83rem;line-height:1.7;padding-left:16px">
+        <li>Manter gestão ativa de passivos — resultados comprovados</li>
+        <li>Avaliar pré-pagamento da 5ª Deb. (CDI+1,4%/1,75%)</li>
+        <li>Continuar swaps IPCA→CDI quando favorável</li>
+        <li>Otimizar caixa excedente (~R$282M acima do ideal)</li>
+        <li>Aproveitar rating AA e status ESG para emissões green sub-CDI</li>
+        <li>Programa recompra aprovado: até 9,77M ações disponível</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">ROIC Histórico vs Custo da Dívida</div>
+  <div class="grid grid-2">
+    <div class="chart-card"><h3>ROIC vs Kd pós IR (%)</h3><canvas id="iraniRoicKd"></canvas></div>
+    <div class="chart-card"><h3>Cronograma Amortização Dívida Irani (R$ mil)</h3><canvas id="iraniAmortIrani"></canvas></div>
+  </div>
+
 </div>
 
 <!-- IRANI FONTES -->
@@ -989,6 +1158,34 @@ new Chart(document.getElementById('iraniPerfilDiv'), {
 new Chart(document.getElementById('iraniMoeda'), {
   type:'doughnut', data:{labels:['BRL (99%)','USD (1%)'],datasets:[{data:[99,1],backgroundColor:[C.klabin,C.grey]}]},
   options:{plugins:{legend:{position:'bottom'}}}
+});
+
+// =============================================
+// IRANI EXERCÍCIO CHARTS
+// =============================================
+new Chart(document.getElementById('iraniDiasCaixa'), {
+  type:'bar', data:{labels:['2024','2025'], datasets:[
+    {label:'Dias no Caixa',data:[168,226],backgroundColor:[C.iraniL,C.irani],borderRadius:6},
+    {label:'Mín. Política',data:[84,81],backgroundColor:C.orange+'80',borderRadius:6},
+    {label:'Ideal (benchmark)',data:[150,150],backgroundColor:C.grey+'80',borderRadius:6}
+  ]},
+  options:{scales:{y:{beginAtZero:true,max:260,title:{display:true,text:'Dias'}}},plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('iraniRoicKd'), {
+  type:'line', data:{labels:['2019','2020','2021','2022','2023','2024','2025'], datasets:[
+    {label:'ROIC',data:[16.1,12.6,24.9,23.0,16.6,10.8,13.3],borderColor:C.irani,backgroundColor:C.irani+'20',fill:true,pointRadius:5,tension:.2},
+    {label:'Kd pós IR',data:[6.8,6.0,6.5,9.1,9.6,7.6,8.9],borderColor:C.red,backgroundColor:'transparent',pointRadius:5,tension:.2,borderDash:[5,5]}
+  ]},
+  options:{scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}},plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('iraniAmortIrani'), {
+  type:'bar', data:{labels:['2026','2027','2028','2029','2030','2031+'], datasets:[
+    {label:'Empréstimos',data:[172614,294025,143741,37220,37220,275761],backgroundColor:C.iraniL,borderRadius:4,stack:'a'},
+    {label:'Debêntures',data:[60952,502133,135057,135714,10485,104789],backgroundColor:C.klabin+'80',borderRadius:4,stack:'a'}
+  ]},
+  options:{scales:{y:{beginAtZero:true,stacked:true,ticks:{callback:v=>(v/1000).toFixed(0)+'M'}},x:{stacked:true}},plugins:{legend:{position:'bottom'}}}
 });
 
 // =============================================
